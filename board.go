@@ -3,16 +3,16 @@ package main
 import "github.com/nsf/termbox-go"
 
 type board struct {
-	cells  [][]int
+	cells  [][]rune
 	width  int
 	height int
 }
 
 func newBoard(width, height int) board {
-	cells := make([][]int, height)
+	cells := make([][]rune, height)
 
 	for i := range cells {
-		cells[i] = make([]int, width)
+		cells[i] = make([]rune, width)
 	}
 
 	return board{

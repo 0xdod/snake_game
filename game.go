@@ -43,6 +43,7 @@ func (g Game) Start() {
 
 Main:
 	for {
+
 		select {
 		case kp := <-ch:
 			switch kp.Action {
@@ -52,11 +53,11 @@ Main:
 				break Main
 			}
 		default:
-			// do nothing and move on instead of waiting
+			// do nothing and move on instead of blocking select
 		}
-		g.snake.Move()
+		g.MoveSnake()
 		g.Render()
-		time.Sleep(500 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond)
 	}
 }
 
@@ -78,4 +79,18 @@ func (g Game) Render() {
 	g.snake.Draw(g.board, left, top)
 	g.food.Draw(g.board, left, top)
 	termbox.Flush()
+}
+
+func (g *Game) MoveSnake() {
+	g.snake.Move()
+	if g.snake.hasHitFood(g.food) {
+		g.score++
+		g.snake.length++
+		g.RespawnFood()
+	}
+}
+
+func (s *snake) hasHitWall(b board) bool {
+	//
+	return false
 }

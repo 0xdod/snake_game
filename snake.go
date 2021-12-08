@@ -48,6 +48,13 @@ func (s *snake) Move() {
 	newBody := make([][2]int, 1)
 	newBody[0] = head
 	newBody = append(newBody, s.body[:len(s.body)-1]...)
+
+	if s.length+2 > len(s.body) {
+		tail := s.Tail()
+		tail[1] -= 1
+		newBody = append(newBody, tail)
+	}
+
 	s.body = newBody
 }
 
@@ -66,22 +73,6 @@ func (s *snake) ChangeDirection(to direction) {
 	s.direction = to
 }
 
-// func (s snake) Move(d direction) {
-
-// 	switch d {
-// 	case Left: // -1 0
-// 		s.body[0][0]--
-// 	case Right: // 1 0
-// 		s.body[0][0]++
-// 	case Up: // 0 -1
-// 		s.body[0][1]--
-// 	case Down: // 0 1
-// 		s.body[0][1]++
-// 	default:
-
-// 	}
-// }
-
 func (s snake) Head() [2]int {
 	return s.body[0]
 }
@@ -90,32 +81,36 @@ func (s snake) Tail() [2]int {
 	return s.body[len(s.body)-1]
 }
 
-func (s snake) Draw(b board, left, top int) {
+func (s *snake) Draw(b board, left, top int) {
 	for i, row := range b.cells {
 		for j, col := range row {
-			if col == 1 {
-				b.cells[i][j] = 0
+			if col == 'h' || col == 's' {
+				b.cells[i][j] = '0'
 			}
 		}
 	}
 
 	for i, v := range s.body {
 		if i == 0 {
-			b.cells[v[0]][v[1]] = 3
+			b.cells[v[0]][v[1]] = 'h'
 		} else {
-			b.cells[v[0]][v[1]] = 1
+			b.cells[v[0]][v[1]] = 's'
 
 		}
 	}
 
 	for i, row := range b.cells {
 		for j, col := range row {
-			if col == 3 {
-				termbox.SetCell(left+j+1, top+i+1, 'h', snakeColor, defaultColor)
-			}
-			if col == 1 {
+			if col == 'h' {
+				termbox.SetCell(left+j+1, top+i+1, 's', termbox.ColorRed, defaultColor)
+			} else if col == 's' {
 				termbox.SetCell(left+j+1, top+i+1, 's', snakeColor, defaultColor)
 			}
 		}
 	}
+}
+
+func (s snake) hasHitFood(f food) bool {
+	h := s.Head()
+	return h[0] == f[0] && h[1] == f[1]
 }

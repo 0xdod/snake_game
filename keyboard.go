@@ -1,13 +1,19 @@
 package main
 
 import (
-	"os"
-
 	"github.com/nsf/termbox-go"
 )
 
+type Action int
+
+const (
+	Move Action = iota + 1
+	Quit
+)
+
 type KeyPress struct {
-	Message string
+	Action
+	direction direction
 }
 
 func listenToKeyboard(ch chan KeyPress) {
@@ -18,18 +24,18 @@ func listenToKeyboard(ch chan KeyPress) {
 		case termbox.EventKey:
 			switch ev.Key {
 			case termbox.KeyArrowLeft:
-
+				ch <- KeyPress{Action: Move, direction: Left}
 			case termbox.KeyArrowDown:
-
+				ch <- KeyPress{Action: Move, direction: Down}
 			case termbox.KeyArrowRight:
-				ch <- KeyPress{"Right arrow"}
+				ch <- KeyPress{Action: Move, direction: Right}
 			case termbox.KeyArrowUp:
-
+				ch <- KeyPress{Action: Move, direction: Up}
 			case termbox.KeyEsc:
-
+				ch <- KeyPress{Action: Quit}
 			default:
 				if ev.Ch == 'q' {
-					os.Exit(0)
+					ch <- KeyPress{Action: Quit}
 				}
 			}
 		case termbox.EventError:

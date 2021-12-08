@@ -58,7 +58,15 @@ func (s *snake) Move() {
 	s.body = newBody
 }
 
-func (s *snake) ChangeDirection(to direction) {
+func (s *snake) ChangeDirection(to direction, paused bool) {
+	if paused {
+		return
+	}
+
+	if s.direction == to {
+		return
+	}
+
 	opposites := map[direction]direction{
 		Left:  Right,
 		Right: Left,
@@ -113,4 +121,22 @@ func (s *snake) Draw(b board, left, top int) {
 func (s snake) hasHitFood(f food) bool {
 	h := s.Head()
 	return h[0] == f[0] && h[1] == f[1]
+}
+
+func (s snake) hasHitWall(b board) bool {
+	head := s.Head()
+
+	return head[0] < 0 || head[1] < 0 || head[0] > b.height-1 || head[1] > b.width-1
+}
+
+func (s snake) hasHitSelf() bool {
+	head := s.Head()
+
+	for _, v := range s.body[1:] {
+		if head[0] == v[0] && head[1] == v[1] {
+			return true
+		}
+	}
+
+	return false
 }

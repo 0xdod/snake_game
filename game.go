@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -14,10 +15,11 @@ const (
 )
 
 type Game struct {
-	board board
-	snake snake
-	food  food
-	score int64
+	board  board
+	snake  snake
+	food   food
+	score  int64
+	paused bool
 }
 
 func NewGame(width, height int) Game {
@@ -43,19 +45,24 @@ func (g Game) Start() {
 
 Main:
 	for {
-
 		select {
 		case kp := <-ch:
 			switch kp.Action {
 			case Move:
-				g.snake.ChangeDirection(kp.direction)
+				g.snake.ChangeDirection(kp.direction, g.paused)
 			case Quit:
 				break Main
+			case Pause:
+				g.paused = !g.paused // toggle paused state
 			}
 		default:
 			// do nothing and move on instead of blocking select
 		}
-		g.MoveSnake()
+
+		if err := g.MoveSnake(); err != nil {
+			break Main
+		}
+
 		g.Render()
 		time.Sleep(200 * time.Millisecond)
 	}
@@ -65,32 +72,43 @@ func (g Game) Render() {
 	termbox.Clear(defaultColor, defaultColor)
 
 	var (
-		w, h = termbox.Size()
-		midY = h / 2
-		midX = w / 2
-		left = midX - (g.board.width / 2)
-		//right = midX + (g.board.width / 2)
+		w, h   = termbox.Size()
+		midY   = h / 2
+		midX   = w / 2
+		left   = midX - (g.board.width / 2)
+		right  = midX + (g.board.width / 2)
 		top    = midY - (g.board.height / 2)
-		bottom = midY + (g.board.height / 2)
+		bottom = midY + (g.board.height / 2) + 1
 	)
 
 	printString(left, top-1, termbox.ColorBlue, defaultColor, fmt.Sprintf("Score: %d", g.score))
+	printString(right-(w/4), top-1, termbox.ColorBlue, defaultColor, "Press SPACE to pause and ESC to quit")
 	g.board.Draw(left, top, bottom)
 	g.snake.Draw(g.board, left, top)
 	g.food.Draw(g.board, left, top)
 	termbox.Flush()
 }
 
-func (g *Game) MoveSnake() {
+func (g *Game) MoveSnake() error {
+	if g.paused {
+		return nil
+	}
+
 	g.snake.Move()
+
 	if g.snake.hasHitFood(g.food) {
 		g.score++
 		g.snake.length++
 		g.RespawnFood()
 	}
-}
 
-func (s *snake) hasHitWall(b board) bool {
-	//
-	return false
+	if g.snake.hasHitSelf() {
+		return errors.New("snake has hit self")
+	}
+
+	if g.snake.hasHitWall(g.board) {
+		return errors.New("snake has hit wall")
+	}
+
+	return nil
 }

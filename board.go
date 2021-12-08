@@ -24,15 +24,15 @@ func newBoard(width, height int) board {
 
 func (b board) Draw(left, top, bottom int) {
 	for i := top; i < bottom; i++ {
-		termbox.SetCell(left, i, '│', defaultColor, bgColor)
-		termbox.SetCell(left+b.width, i, '│', defaultColor, bgColor)
+		termbox.SetCell(left-1, i, '│', defaultColor, bgColor)
+		termbox.SetCell(left+b.width+1, i, '│', defaultColor, bgColor)
 	}
 
-	termbox.SetCell(left, top, '┌', defaultColor, bgColor)
-	termbox.SetCell(left, bottom, '└', defaultColor, bgColor)
-	termbox.SetCell(left+b.width, top, '┐', defaultColor, bgColor)
-	termbox.SetCell(left+b.width, bottom, '┘', defaultColor, bgColor)
+	termbox.SetCell(left-1, top, '┌', defaultColor, bgColor)
+	termbox.SetCell(left-1, bottom, '└', defaultColor, bgColor)
+	termbox.SetCell(left+b.width+1, top, '┐', defaultColor, bgColor)
+	termbox.SetCell(left+b.width+1, bottom, '┘', defaultColor, bgColor)
 
-	fillX(left+1, top, b.width-1, termbox.Cell{Ch: '─'})
-	fillX(left+1, bottom, b.width-1, termbox.Cell{Ch: '─'})
+	fillX(left, top, b.width+1, termbox.Cell{Ch: '─'})
+	fillX(left, bottom, b.width+1, termbox.Cell{Ch: '─'})
 }

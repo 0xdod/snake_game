@@ -10,6 +10,7 @@ const (
 	Move Action = iota + 1
 	Quit
 	Restart
+	Pause
 )
 
 type KeyPress struct {
@@ -34,6 +35,8 @@ func listenToKeyboard(ch chan KeyPress) {
 				ch <- KeyPress{Action: Move, direction: Up}
 			case termbox.KeyEsc:
 				ch <- KeyPress{Action: Quit}
+			case termbox.KeySpace:
+				ch <- KeyPress{Action: Pause}
 			default:
 				if ev.Ch == 'r' {
 					ch <- KeyPress{Action: Restart}

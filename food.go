@@ -17,6 +17,11 @@ func (g *Game) RespawnFood() {
 	row := r.Intn(g.board.height - 1)
 	col := r.Intn(g.board.width - 1)
 
+	if g.board.cells[row][col] == 's' {
+		g.RespawnFood()
+		return
+	}
+
 	g.food = food{row, col}
 }
 

@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 )
@@ -10,9 +11,10 @@ import (
 func main() {
 	width, height := getBoardDimension()
 	g := NewGame(width, height)
-	g.Start()
 
-	fmt.Println("Snake died, game has ended")
+	if err := g.Start(); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func getBoardDimension() (width, height int) {

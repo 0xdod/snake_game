@@ -32,9 +32,9 @@ func NewGame(width, height int) Game {
 	return g
 }
 
-func (g Game) Start() {
+func (g Game) Start() error {
 	if err := termbox.Init(); err != nil {
-		panic(err)
+		return err
 	}
 
 	defer termbox.Close()
@@ -42,7 +42,9 @@ func (g Game) Start() {
 	ch := make(chan KeyPress)
 	go listenToKeyboard(ch)
 
-	g.Render()
+	if err := g.Render(); err != nil {
+		return err
+	}
 
 Main:
 	for {
@@ -61,16 +63,25 @@ Main:
 		}
 
 		if err := g.MoveSnake(); err != nil {
-			break Main
+			return err
 		}
 
-		g.Render()
+		if err := g.Render(); err != nil {
+			return err
+		}
+
 		time.Sleep(200 * time.Millisecond)
 	}
+
+	return nil
 }
 
-func (g Game) Render() {
-	termbox.Clear(defaultColor, defaultColor)
+func (g Game) Render() error {
+	err := termbox.Clear(defaultColor, defaultColor)
+
+	if err != nil {
+		return err
+	}
 
 	var (
 		w, h = termbox.Size()
@@ -88,7 +99,8 @@ func (g Game) Render() {
 	g.board.Draw(left, top, bottom)
 	g.snake.Draw(g.board, left, top)
 	g.food.Draw(g.board, left, top)
-	termbox.Flush()
+
+	return termbox.Flush()
 }
 
 func (g *Game) MoveSnake() error {

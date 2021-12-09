@@ -1,6 +1,8 @@
 # Snake Game
 A simple terminal-based snake game built with [go](//golang.org) and [termbox](//github.com/nsf/termbox-go) library.
 
+This is a test task for a Golang positon. It took 3 days for me to finish this task. 
+
 ![screencast](/assets/screencast.gif)
 
 ## Setup

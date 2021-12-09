@@ -20,6 +20,7 @@ type Game struct {
 	food   food
 	score  int64
 	paused bool
+	round  int64
 }
 
 func NewGame(width, height int) Game {
@@ -72,17 +73,18 @@ func (g Game) Render() {
 	termbox.Clear(defaultColor, defaultColor)
 
 	var (
-		w, h   = termbox.Size()
-		midY   = h / 2
-		midX   = w / 2
-		left   = midX - (g.board.width / 2)
-		right  = midX + (g.board.width / 2)
+		w, h = termbox.Size()
+		midY = h / 2
+		midX = w / 2
+		left = midX - (g.board.width / 2)
+		//right  = midX + (g.board.width / 2)
 		top    = midY - (g.board.height / 2)
 		bottom = midY + (g.board.height / 2) + 1
 	)
 
 	printString(left, top-1, termbox.ColorBlue, defaultColor, fmt.Sprintf("Score: %d", g.score))
-	printString(right-(w/4), top-1, termbox.ColorBlue, defaultColor, "Press SPACE to pause and ESC to quit")
+	printString(left+15, top-1, termbox.ColorBlue, defaultColor, fmt.Sprintf("Round: %d", g.round))
+	printString(left, bottom+2, termbox.ColorBlue, defaultColor, "Press SPACE to pause and ESC to quit")
 	g.board.Draw(left, top, bottom)
 	g.snake.Draw(g.board, left, top)
 	g.food.Draw(g.board, left, top)
@@ -95,6 +97,7 @@ func (g *Game) MoveSnake() error {
 	}
 
 	g.snake.Move()
+	g.round += 1
 
 	if g.snake.hasHitFood(g.food) {
 		g.score++

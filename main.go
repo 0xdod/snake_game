@@ -23,8 +23,19 @@ func getBoardDimension() (width, height int) {
 	fmt.Println("Enter gameboard width: ")
 	sc.Scan()
 	w := sc.Text()
-	height, _ = strconv.Atoi(h)
-	width, _ = strconv.Atoi(w)
+
+	var err error
+	height, err = strconv.Atoi(h)
+
+	if err != nil {
+		height = 12 // default value
+	}
+
+	width, err = strconv.Atoi(w)
+
+	if err != nil {
+		width = 80
+	}
 
 	return
 }
